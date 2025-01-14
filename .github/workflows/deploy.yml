@@ -18,8 +18,55 @@ jobs:
     - name: Set up SSH
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        cat ~/.ssh/id_rsa  # Test için özel anahtarın içeriğini loglara yazdırır
+        echo "-----BEGIN OPENSSH PRIVATE KEY-----
+        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
+        -----END OPENSSH PRIVATE KEY-----" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H 10.36.5.44 >> ~/.ssh/known_hosts
 
