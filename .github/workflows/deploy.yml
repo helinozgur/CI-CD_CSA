@@ -13,6 +13,9 @@ jobs:
     # 1. Kodu GitHub Actions'a alın
     - name: Checkout code
       uses: actions/checkout@v3
+    
+    - name: Test Echo
+      run: echo "Hello World"
 
     # 2. SSH Anahtarını Ayarla
     - name: Set up SSH
