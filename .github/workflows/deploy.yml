@@ -34,6 +34,7 @@ jobs:
         ${{ secrets.SSH_PRIVATE_KEY }}
         EOF
         chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H 10.36.5.44 >> ~/.ssh/known_hosts
 
     # 4. Sunucuya Flask Kodlarını Kopyala
     - name: Copy files to server
