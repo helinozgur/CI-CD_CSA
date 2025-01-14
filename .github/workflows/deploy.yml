@@ -34,7 +34,12 @@ jobs:
         ${{ secrets.SSH_PRIVATE_KEY }}
         EOF
         chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H 10.36.5.44 >> ~/.ssh/known_hosts
+        touch ~/.ssh/known_hosts
+        chmod 600 ~/.ssh/known_hosts
+        ssh-keyscan -H 10.36.5.44 > /tmp/known_hosts
+        cat /tmp/known_hosts >> ~/.ssh/known_hosts
+        echo "Known hosts successfully updated"
+        cat ~/.ssh/known_hosts  # Debugging için known_hosts içeriğini göster
 
     # 4. Sunucuya Flask Kodlarını Kopyala
     - name: Copy files to server
