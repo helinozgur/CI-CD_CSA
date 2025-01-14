@@ -13,14 +13,12 @@ jobs:
     # 1. Kodu GitHub Actions'a alın
     - name: Checkout code
       uses: actions/checkout@v3
-    
-    - name: Test Echo
-      run: echo "Hello World"
 
     # 2. SSH Anahtarını Ayarla
     - name: Set up SSH
       run: |
         mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}"
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H 10.36.5.44 >> ~/.ssh/known_hosts
