@@ -10,11 +10,15 @@ jobs:
     runs-on: ubuntu-latest  # Workflow'un çalışacağı makine
 
     steps:
-    # 1. Test: SSH_KEY_GEN Secret'ını Print Et
-    - name: Test SSH_KEY_GEN
+    # 1. Test SSH_PRIVATE_KEY Secret'ını
+    - name: Test SSH_PRIVATE_KEY
       run: |
-        echo "Golive"
-        echo "${{ secrets.SSH_PRIVATE_KEY }}"
+        if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+          echo "Error: SSH_PRIVATE_KEY is not set or empty"
+          exit 1
+        else
+          echo "SSH_PRIVATE_KEY is set and has length: ${#secrets.SSH_PRIVATE_KEY}"
+        fi
 
     # 2. Kodu GitHub Actions'a alın
     - name: Checkout code
@@ -24,7 +28,7 @@ jobs:
     - name: Set up SSH
       run: |
         mkdir -p ~/.ssh
-
+        cat <<EOF > ~/.ssh/id_rsa
 
     # 4. Sunucuya Flask Kodlarını Kopyala
     - name: Copy files to server
@@ -48,6 +52,9 @@ jobs:
     - name: Restart Flask App
       run: |
         ssh -i ~/.ssh/id_rsa pam_golive@10.36.5.44 << 'EOF'
-          pkill -f app.py || true
-          nohup python3 ~/flask_app/app.py > ~/flask_app/output.log 2>&1 &
+          cd ~/flask_app
+          # Eğer varsa mevcut Flask sürecini durdur
+          pkill -f "python3 app.py" || true
+          # Flask uygulamasını arka planda başlat
+          nohup python3 app.py > flask.log 2>&1 &
         EOF
