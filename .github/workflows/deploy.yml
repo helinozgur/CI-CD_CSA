@@ -13,6 +13,7 @@ jobs:
     # 1. Test: SSH_KEY_GEN Secret'ını Print Et
     - name: Test SSH_KEY_GEN
       run: |
+        echo "Golive"
         echo "${{ secrets.SSH_KEY_GEN }}"
 
     # 2. Kodu GitHub Actions'a alın
