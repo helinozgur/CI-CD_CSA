@@ -17,7 +17,9 @@ jobs:
           echo "Error: SSH_PRIVATE_KEY is not set or empty"
           exit 1
         else
-          echo "SSH_PRIVATE_KEY is set and has length: ${#secrets.SSH_PRIVATE_KEY}"
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /tmp/ssh_key
+          key_length=$(wc -c < /tmp/ssh_key)  # Anahtar uzunluğunu hesapla
+          echo "SSH_PRIVATE_KEY is set and has length: $key_length"
         fi
 
     # 2. Kodu GitHub Actions'a alın
