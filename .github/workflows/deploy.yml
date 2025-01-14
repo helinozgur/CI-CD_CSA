@@ -1,0 +1,49 @@
+name: Flask CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Sadece 'main' dalına yapılan değişikliklerde tetiklenir
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # Workflow'un çalışacağı makine
+
+    steps:
+    # 1. Kodu GitHub Actions'a alın
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # 2. SSH Anahtarını Ayarla
+    - name: Set up SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H 10.36.5.44 >> ~/.ssh/known_hosts
+
+    # 3. Sunucuya Flask Kodlarını Kopyala
+    - name: Copy files to server
+      run: |
+        ssh -i ~/.ssh/id_rsa pam_golive@10.36.5.44 "mkdir -p ~/flask_app"
+        scp -i ~/.ssh/id_rsa -r ./* pam_golive@10.36.5.44:~/flask_app
+
+    # 4. Sunucuda Flask Bağımlılıklarını Yükle
+    - name: Install Flask dependencies
+      run: |
+        ssh -i ~/.ssh/id_rsa pam_golive@10.36.5.44 << 'EOF'
+          sudo apt update
+          sudo apt install -y python3 python3-pip
+          cd ~/flask_app
+          if [ -f requirements.txt ]; then
+            python3 -m pip install -r requirements.txt
+          fi
+        EOF
+
+    # 5. Flask Uygulamasını Yeniden Başlat
+    - name: Restart Flask App
+      run: |
+        ssh -i ~/.ssh/id_rsa pam_golive@10.36.5.44 << 'EOF'
+          pkill -f app.py || true
+          nohup python3 ~/flask_app/app.py > ~/flask_app/output.log 2>&1 &
+        EOF
